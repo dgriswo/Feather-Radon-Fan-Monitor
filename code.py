@@ -22,7 +22,6 @@ import digitalio
 import busio
 import asyncio
 import countio
-import supervisor
 import microcontroller
 import ssl
 import socketpool
@@ -139,21 +138,15 @@ def publish_to_mqtt(topic, message):  # pylint: disable=redefined-outer-name
         except (OSError, MQTT.MMQTTException):
             """Couldn't reconnect and publish."""
             print("Cound not reconnect to MQTT.")
-            if supervisor.runtime.serial_connected:
-                raise
             microcontroller.reset()
     except OSError:
         """wifi is not connected."""
         print("WiFi not connected")
-        if supervisor.runtime.serial_connected:
-            raise
         microcontroller.reset()
     finally:
         try:
             mqtt_client.publish(topic, message, retain=True)
         except (OSError, MQTT.MMQTTException):
-            if supervisor.runtime.serial_connected:
-                raise
             microcontroller.reset()
 
 
@@ -195,10 +188,7 @@ except RuntimeError as e:
         pass
     i2c.writeto(0x00, bytes([0x06]))
     time.sleep(2)
-    if supervisor.runtime.serial_connected:
-        raise
-    supervisor.reload()
-
+    microcontroller.reset()
 
 red_led = digitalio.DigitalInOut(board.IO1)
 red_led.switch_to_output(False)
