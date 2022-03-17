@@ -64,7 +64,7 @@ async def get_sensor_data():
 
 
 async def publish_sensor_data():
-    """ once a minute, publish the sensor data to MQTT. """
+    """once a minute, publish the sensor data to MQTT."""
     while True:
         publish_to_mqtt(MQTT_ENVIRONMENT, json.dumps(sensors))
         await asyncio.sleep(60)
@@ -115,7 +115,7 @@ async def check_radon_health():
 
 
 async def check_buzzer_suppress():
-    """ check if the suppress button has been pressed and extend suppression time. """
+    """check if the suppress button has been pressed and extend suppression time."""
 
     global buzzer_suppress_time  # pylint: disable=invalid-name, global-statement
     suppress_button = countio.Counter(board.IO11, pull=digitalio.Pull.UP)
@@ -151,7 +151,7 @@ def publish_to_mqtt(topic, message):  # pylint: disable=redefined-outer-name
 
 
 async def update_ccs811_baseline():
-    """ Every day, write the ccs811 baseline to nvm """
+    """Every day, write the ccs811 baseline to nvm"""
     while True:
         await asyncio.sleep(86400)
         config["ccs811_baseline"] = ccs811.baseline
@@ -168,7 +168,10 @@ async def main():
     tasks.append(asyncio.create_task(check_radon_health()))
     tasks.append(asyncio.create_task(check_buzzer_suppress()))
 
-    await asyncio.gather(*tasks)
+    try:
+        await asyncio.gather(*tasks, return_exceptions=True)
+    except Exception:  # pylint: disable=broad-except
+        microcontroller.reset()
 
 
 try:
