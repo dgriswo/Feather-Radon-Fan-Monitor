@@ -46,10 +46,10 @@ async def get_sensor_data():
     # global sensors
 
     while True:
-        sensors["differential_pressure"] = sdp31.differential_pressure
-        sensors["temperature"] = bme280.temperature
-        sensors["humidity"] = bme280.relative_humidity
-        sensors["pressure"] = bme280.pressure
+        sensors["differential_pressure"] = round(sdp31.differential_pressure)
+        sensors["temperature"] = round(bme280.temperature, 1)
+        sensors["humidity"] = round(bme280.relative_humidity)
+        sensors["pressure"] = round(bme280.pressure)
         sensors["radon_pressure"] = (
             sensors["pressure"] - sensors["differential_pressure"]
         )
