@@ -229,8 +229,8 @@ try:
 
     print("Connecting to %s" % secrets["mqtt_broker"])
     mqtt_client.connect()
-except (MQTT.MMQTTException, OSError) as error:
+except (MQTT.MMQTTException, OSError, RuntimeError) as error:
     print("Could not connect to mqtt broker. {}".format(error))
-    raise
+    microcontroller.reset()
 
 asyncio.run(main())
